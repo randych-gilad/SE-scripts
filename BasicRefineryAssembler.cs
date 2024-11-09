@@ -12,33 +12,17 @@ public void Main()
 {
   IMyInventory refineryOutput = GridTerminalSystem.GetBlockWithName("Basic Refinery").GetInventory(1);
   IMyInventory assemblerInput = GridTerminalSystem.GetBlockWithName("Basic Assembler").GetInventory(0);
-  // IMyInventory cargoInventory = GridTerminalSystem.GetBlockWithName("Small Cargo Container").GetInventory(0);
 
   if (refineryOutput == null || assemblerInput == null)
     {
         Echo("Error: Could not access one or both inventories");
         return;
     }
-  // if (cargoInventory == null)
-  // {
-  //     Echo("Error: Could not access gravel destination inventory");
-  // }
 
   if (!IsStart(refineryOutput.ItemCount))
     {
         return;
     }
-  // doesn't actually check conveyor reachability, sorry
-  // if (!refineryOutput.IsConnectedTo(assemblerInput))
-  // {
-  //     Echo("ERROR: refinery is not connected with assembler");
-  //     return;
-  // }
-  // if (!refineryOutput.IsConnectedTo(cargoInventory))
-  // {
-  //     Echo("ERROR: refinery is not connected with gravel destination");
-  //     return;
-  // }
   TransferItems(refineryOutput, assemblerInput);
 }
 
@@ -67,6 +51,11 @@ public bool IsEnoughSpace(IMyInventory src, IMyInventory dst)
 public void TransferItems(IMyInventory src, IMyInventory dst)
 {
   int itemCount = src.ItemCount;
+  if (!src.CanTransferItemTo(dst))
+    {
+      Echo("ERROR: no connection between refinery and assembler");
+      return;
+    }
 
   while (itemCount > 0)
   {
