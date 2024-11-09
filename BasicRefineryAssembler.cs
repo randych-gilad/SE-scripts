@@ -13,6 +13,28 @@ public void Main()
 
 }
 
+public bool IsEnoughSpace(IMyInventory src, IMyInventory dst)
+{
+  int itemCount = src.ItemCount;
+  MyInventoryItem item = src.GetItemAt(0).Value;
+  int decimalAmount = (int) item.Amount;
+  MyFixedPoint itemVolume = (MyFixedPoint) src.GetItemAt(0).Value.Type.GetItemInfo().Volume;
+
+  MyFixedPoint availableSpace = dst.MaxVolume - dst.CurrentVolume;
+
+  if (availableSpace < itemVolume)
+    {
+        Echo($"ERROR: Not enough space to transfer {decimalAmount} {item.Type.SubtypeId}");
+        if (debug)
+            {
+            Echo($"max volume: {dst.MaxVolume}, current space: {dst.CurrentVolume}, amount: {decimalAmount}, available space: {availableSpace}");
+            Echo($"ERROR: Need {(int)(item.Amount - (int) availableSpace)} more space");
+            }
+        return false;
+    }
+  return true;
+}
+
 public void TransferItems(IMyInventory src, IMyInventory dst)
 {
   int itemCount = src.ItemCount;
@@ -27,11 +49,11 @@ public void TransferItems(IMyInventory src, IMyInventory dst)
       Echo($"Type id: {item.Type.TypeId}, Subtype id: {item.Type.SubtypeId}");
       }
 
-    if (!CanAcceptItem(src, dst)) { return; }
+    if (!IsEnoughSpace(src, dst)) { return; }
 
     // if (item.Type.SubtypeId == "Stone")
     // {
-    //     if (!CanAcceptItem(src, dstGravel)) { return; }
+    //     if (!IsEnoughSpace(src, dstGravel)) { return; }
     //     bool succ = dstGravel.TransferItemFrom(src, 0, null, true, null);
     //     if (succ)
     //     {
