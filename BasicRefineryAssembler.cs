@@ -10,20 +10,23 @@ bool debug = false;
 
 public void Main()
 {
-  IMyInventory refineryOutput = GridTerminalSystem.GetBlockWithName("Basic Refinery").GetInventory(1);
-  IMyInventory assemblerInput = GridTerminalSystem.GetBlockWithName("Basic Assembler").GetInventory(0);
+  IMyInventory refineryOutput = GridTerminalSystem.GetBlockWithName("Refinery").GetInventory(1);
+  IMyInventory assemblerInput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(0);
+  IMyInventory assemblerOutput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(1);
+  IMyInventory assemblerContainer = GridTerminalSystem.GetBlockWithName("Assembler Output").GetInventory(0);
 
-  if (refineryOutput == null || assemblerInput == null)
+  if (refineryOutput == null || assemblerInput == null || assemblerContainer == null)
     {
         Echo("Error: Could not access one or both inventories");
         return;
     }
 
-  if (!IsStart(refineryOutput.ItemCount))
+  if (!IsStart(refineryOutput.ItemCount) && !IsStart(assemblerOutput.ItemCount))
     {
         return;
     }
   TransferItems(refineryOutput, assemblerInput);
+  TransferItems(assemblerOutput, assemblerContainer);
 }
 
 public bool IsEnoughSpace(IMyInventory src, IMyInventory dst)
