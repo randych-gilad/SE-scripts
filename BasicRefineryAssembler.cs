@@ -51,16 +51,17 @@ public bool IsEnoughSpace(IMyInventory src, IMyInventory dst)
 public void TransferItems(IMyInventory src, IMyInventory dst)
 {
   int itemCount = src.ItemCount;
-  if (!src.CanTransferItemTo(dst))
-    {
-      Echo("ERROR: no connection between refinery and assembler");
-      return;
-    }
 
   while (itemCount > 0)
   {
     MyInventoryItem item = src.GetItemAt(0).Value;
     int decimalAmount = (int) item.Amount;
+    
+    if (!src.CanTransferItemTo(dst, src.GetItemAt(0).Value.Type))
+      {
+        Echo("ERROR: no connection between refinery and assembler");
+        return;
+      }
 
     if (debug)
       {
