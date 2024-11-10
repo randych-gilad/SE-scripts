@@ -17,7 +17,7 @@ public void Main()
 
   if (refineryOutput == null || assemblerInput == null || assemblerContainer == null)
     {
-        Echo("Error: Could not access one or both inventories");
+        throw new Exception("Could not access one inventories");
         return;
     }
 
