@@ -1,4 +1,6 @@
-﻿using Sandbox.Game.EntityComponents;
+﻿using Sandbox.Common.ObjectBuilders.Definitions;
+using Sandbox.Game.EntityComponents;
+using Sandbox.Game.Screens;
 using Sandbox.ModAPI.Ingame;
 using Sandbox.ModAPI.Interfaces;
 using SpaceEngineers.Game.ModAPI.Ingame;
@@ -30,10 +32,11 @@ namespace IngameScript
       Runtime.UpdateFrequency = UpdateFrequency.Update100;
     }
 
-    bool debug = false;
+    static bool debug = false;
 
     public void Main()
     {
+      IMyTextSurface screen = Me.GetSurface(0);
       IMyInventory refineryOutput = GridTerminalSystem.GetBlockWithName("Refinery").GetInventory(1);
       IMyInventory assemblerInput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(0);
       IMyInventory assemblerOutput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(1);
@@ -44,7 +47,7 @@ namespace IngameScript
         throw new Exception("Could not access one inventories");
       }
 
-      if (!IsStart(refineryOutput.ItemCount) && !IsStart(assemblerOutput.ItemCount))
+      if (!IsStart(refineryOutput.ItemCount, screen) && !IsStart(assemblerOutput.ItemCount, screen))
       {
         return;
       }
@@ -84,7 +87,7 @@ namespace IngameScript
 
         if (!src.CanTransferItemTo(dst, item.Type))
         {
-          Echo("ERROR: no connection between refinery and assembler");
+          Echo($"ERROR: no connection between refinery and assembler");
           return;
         }
 
@@ -116,11 +119,11 @@ namespace IngameScript
       }
     }
 
-    public bool IsStart(int itemCount)
+    public bool IsStart(int itemCount, IMyTextSurface screen)
     {
       if (itemCount == 0)
       {
-        Echo("Nothing to transfer");
+        screen.WriteText("Nothing to transfer");
         return false;
       }
       else
