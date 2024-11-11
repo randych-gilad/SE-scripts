@@ -42,7 +42,6 @@ namespace IngameScript
       if (refineryOutput == null || assemblerInput == null || assemblerContainer == null)
       {
         throw new Exception("Could not access one inventories");
-        return;
       }
 
       if (!IsStart(refineryOutput.ItemCount) && !IsStart(assemblerOutput.ItemCount))
@@ -82,9 +81,8 @@ namespace IngameScript
       while (itemCount > 0)
       {
         MyInventoryItem item = src.GetItemAt(0).Value;
-        int decimalAmount = (int)item.Amount;
 
-        if (!src.CanTransferItemTo(dst, src.GetItemAt(0).Value.Type))
+        if (!src.CanTransferItemTo(dst, item.Type))
         {
           Echo("ERROR: no connection between refinery and assembler");
           return;
@@ -97,25 +95,7 @@ namespace IngameScript
 
         if (!IsEnoughSpace(src, dst)) { return; }
 
-        // if (item.Type.SubtypeId == "Stone")
-        // {
-        //     if (!IsEnoughSpace(src, dstGravel)) { return; }
-        //     bool succ = dstGravel.TransferItemFrom(src, 0, null, true, null);
-        //     if (succ)
-        //     {
-        //         Echo($"Transferred {decimalAmount} Gravel to cargo container");
-        //         itemCount--;
-        //     }
-        //     else
-        //     {
-        //         Echo($"ERROR: Failed to transfer {decimalAmount} Gravel");
-        //         Echo($"ERROR: Check conveyor from refinery to cargo container");
-        //         Echo($"INFO: There are no checks for gravel container free space");
-        //         return;
-        //     }
-        // }
-        // else
-
+        int decimalAmount = (int)item.Amount;
         {
           bool succ = dst.TransferItemFrom(src, 0, null, true, null);
           if (succ)
