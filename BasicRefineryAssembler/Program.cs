@@ -24,29 +24,33 @@ namespace IngameScript
 {
   partial class Program : MyGridProgram
   {
+    // Global declaration for constructor at compile time
+    static bool debug = false;
+    IMyInventory refineryOutput;
+    IMyInventory assemblerInput;
+    IMyInventory assemblerOutput;
+    IMyInventory assemblerContainer;
     public Program()
     {
       // UpdateFrequency.None -> on demand
       // UpdateFrequency.Update10 -> 10 ticks (<1 seconds)
       // UpdateFrequency.Update100 -> 100 ticks (1.7 seconds)
       Runtime.UpdateFrequency = UpdateFrequency.Update100;
-    }
 
-    static bool debug = false;
+      refineryOutput = GridTerminalSystem.GetBlockWithName("Refinery").GetInventory(1);
+      assemblerInput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(0);
+      assemblerOutput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(1);
+      assemblerContainer = GridTerminalSystem.GetBlockWithName("Assembler Output").GetInventory(0);
+    }
 
     public void Main()
     {
       IMyTextSurface screen = Me.GetSurface(0);
       screen.FontSize = 0.5F;
 
-      IMyInventory refineryOutput = GridTerminalSystem.GetBlockWithName("Refinery").GetInventory(1);
-      IMyInventory assemblerInput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(0);
-      IMyInventory assemblerOutput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(1);
-      IMyInventory assemblerContainer = GridTerminalSystem.GetBlockWithName("Assembler Output").GetInventory(0);
-
       if (refineryOutput == null || assemblerInput == null || assemblerContainer == null)
       {
-        throw new Exception("Could not access one inventories");
+        throw new Exception("Could not access one of inventories");
       }
 
       if (!IsStart(refineryOutput.ItemCount, screen) && !IsStart(assemblerOutput.ItemCount, screen))
