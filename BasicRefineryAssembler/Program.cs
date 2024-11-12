@@ -37,6 +37,8 @@ namespace IngameScript
     public void Main()
     {
       IMyTextSurface screen = Me.GetSurface(0);
+      screen.FontSize = 0.5F;
+
       IMyInventory refineryOutput = GridTerminalSystem.GetBlockWithName("Refinery").GetInventory(1);
       IMyInventory assemblerInput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(0);
       IMyInventory assemblerOutput = GridTerminalSystem.GetBlockWithName("Assembler").GetInventory(1);
@@ -51,11 +53,11 @@ namespace IngameScript
       {
         return;
       }
-      TransferItems(refineryOutput, assemblerInput);
-      TransferItems(assemblerOutput, assemblerContainer);
+      TransferItems(refineryOutput, assemblerInput, screen);
+      TransferItems(assemblerOutput, assemblerContainer, screen);
     }
 
-    public bool IsEnoughSpace(IMyInventory src, IMyInventory dst)
+    public bool IsEnoughSpace(IMyInventory src, IMyInventory dst, IMyTextSurface screen)
     {
       int itemCount = src.ItemCount;
       MyInventoryItem item = src.GetItemAt(0).Value;
@@ -66,18 +68,18 @@ namespace IngameScript
 
       if (availableSpace < itemVolume)
       {
-        Echo($"ERROR: Not enough space to transfer {decimalAmount} {item.Type.SubtypeId}");
+        screen.WriteText($"ERROR: Not enough space to transfer {decimalAmount} {item.Type.SubtypeId}");
         if (debug)
         {
-          Echo($"max volume: {dst.MaxVolume}, current space: {dst.CurrentVolume}, amount: {decimalAmount}, available space: {availableSpace}");
-          Echo($"ERROR: Need {(int)(item.Amount - (int)availableSpace)} more space");
+          screen.WriteText($"max volume: {dst.MaxVolume}, current space: {dst.CurrentVolume}, amount: {decimalAmount}, available space: {availableSpace}");
+          screen.WriteText($"ERROR: Need {(int)(item.Amount - (int)availableSpace)} more space");
         }
         return false;
       }
       return true;
     }
 
-    public void TransferItems(IMyInventory src, IMyInventory dst)
+    public void TransferItems(IMyInventory src, IMyInventory dst, IMyTextSurface screen)
     {
       int itemCount = src.ItemCount;
 
@@ -93,22 +95,22 @@ namespace IngameScript
 
         if (debug)
         {
-          Echo($"Type id: {item.Type.TypeId}, Subtype id: {item.Type.SubtypeId}");
+          screen.WriteText($"Type id: {item.Type.TypeId}, Subtype id: {item.Type.SubtypeId}");
         }
 
-        if (!IsEnoughSpace(src, dst)) { return; }
+        if (!IsEnoughSpace(src, dst, screen)) { return; }
 
         int decimalAmount = (int)item.Amount;
         {
           bool succ = dst.TransferItemFrom(src, 0, null, true, null);
           if (succ)
           {
-            Echo($"Transferred {decimalAmount} {item.Type.SubtypeId} from source to destination");
+            screen.WriteText($"Transferred {decimalAmount} {item.Type.SubtypeId} from source to destination");
             itemCount--;
           }
           else
           {
-            Echo($"Failed to transfer {decimalAmount} {item.Type.SubtypeId}");
+            screen.WriteText($"Failed to transfer {decimalAmount} {item.Type.SubtypeId}");
           }
         }
       }
@@ -128,7 +130,7 @@ namespace IngameScript
       }
       else
       {
-        Echo("Started transfer process");
+        screen.WriteText("Started transfer process");
         return true;
       }
     }
